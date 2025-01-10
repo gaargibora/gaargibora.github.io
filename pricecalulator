@@ -1,92 +1,94 @@
-import java.util.*;
+// Dessert Pricing Calculator
 
-public class DessertPricingCalculator {
+function calculatePrice(dessertType, quantity, mixins) {
+    // Base prices
+    const basePrices = {
+        cookies: 12.0,  // per dozen
+        cupcakes: 15.0, // per dozen
+        lunchbox_cake: 15.0 // per cake
+    };
 
-    public static double calculatePrice(String dessertType, int quantity, List<String> mixins) {
-        // Base prices
-        Map<String, Double> basePrices = new HashMap<>();
-        basePrices.put("cookies", 12.0);  // per dozen
-        basePrices.put("cupcakes", 15.0); // per dozen
-        basePrices.put("lunchbox_cake", 15.0); // per cake
+    // Price per unit for less than a dozen
+    const perUnitPrices = {
+        cookies: 1.0, // per cookie
+        cupcakes: 1.25 // per cupcake
+    };
 
-        // Price per unit for less than a dozen
-        Map<String, Double> perUnitPrices = new HashMap<>();
-        perUnitPrices.put("cookies", 1.0); // per cookie
-        perUnitPrices.put("cupcakes", 1.25); // per cupcake
+    // Mix-in/add-on prices
+    const mixinPrices = {
+        chocolate_chunks: 2.0,
+        toffee_bits: 2.0,
+        m&ms: 2.0,
+        chopped_pecans: 3.0,
+        macadamia_nuts: 3.0,
+        white_chocolate_chips: 2.0,
+        matcha: 3.0,
+        ganache: 2.0,
+        salted_caramel: 2.0,
+        fruit_preserves: 2.0,
+        pastry_cream: 3.0,
+        none: 0.0
+    };
 
-        // Mix-in/add-on prices
-        Map<String, Double> mixinPrices = new HashMap<>();
-        mixinPrices.put("chocolate_chunks", 2.0);
-        mixinPrices.put("toffee_bits", 2.0);
-        mixinPrices.put("m&ms", 2.0);
-        mixinPrices.put("chopped_pecans", 3.0);
-        mixinPrices.put("macadamia_nuts", 3.0);
-        mixinPrices.put("white_chocolate_chips", 2.0);
-        mixinPrices.put("matcha", 3.0);
-        mixinPrices.put("ganache", 2.0);
-        mixinPrices.put("salted_caramel", 2.0);
-        mixinPrices.put("fruit_preserves", 2.0);
-        mixinPrices.put("pastry_cream", 3.0);
-        mixinPrices.put("none", 0.0);
+    let price = 0.0;
 
-        double price = 0.0;
+    // Calculate base price
+    if (dessertType === "cookies" || dessertType === "cupcakes") {
+        const dozens = Math.floor(quantity / 12);
+        const remainder = quantity % 12;
 
-        // Calculate base price
-        if (dessertType.equals("cookies") || dessertType.equals("cupcakes")) {
-            int dozens = quantity / 12;
-            int remainder = quantity % 12;
+        price = dozens * basePrices[dessertType];
+        if (remainder > 0) {
+            price += remainder * perUnitPrices[dessertType];
+        }
+    } else if (dessertType === "lunchbox_cake") {
+        price = quantity * basePrices[dessertType];
+    } else {
+        throw new Error("Invalid dessert type");
+    }
 
-            price = dozens * basePrices.get(dessertType);
-            if (remainder > 0) {
-                price += remainder * perUnitPrices.get(dessertType);
-            }
-        } else if (dessertType.equals("lunchbox_cake")) {
-            price = quantity * basePrices.get(dessertType);
+    // Add mix-in prices
+    mixins.forEach(mixin => {
+        if (mixinPrices.hasOwnProperty(mixin)) {
+            price += mixinPrices[mixin] * quantity;
         } else {
-            throw new IllegalArgumentException("Invalid dessert type");
+            throw new Error(`Invalid mix-in: ${mixin}`);
         }
+    });
 
-        // Add mix-in prices
-        for (String mixin : mixins) {
-            if (mixinPrices.containsKey(mixin)) {
-                price += mixinPrices.get(mixin) * quantity;
-            } else {
-                throw new IllegalArgumentException("Invalid mix-in: " + mixin);
-            }
-        }
-
-        return price;
-    }
-
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-
-        System.out.println("Welcome to the Dessert Pricing Calculator!");
-
-        // Get dessert type
-        System.out.print("Enter the type of dessert (cookies, cupcakes, lunchbox_cake): ");
-        String dessertType = scanner.nextLine().toLowerCase();
-
-        // Get quantity
-        System.out.print("Enter the quantity: ");
-        int quantity = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
-
-        // Get mix-ins
-        System.out.println("Available mix-ins for cookies: chocolate_chunks, toffee_bits, m&ms, chopped_pecans, macadamia_nuts, white_chocolate_chips, matcha");
-        System.out.println("Available add-ons for cupcakes: ganache, salted_caramel, fruit_preserves, pastry_cream");
-        System.out.print("Enter mix-ins separated by commas (e.g., chocolate_chunks,toffee_bits): ");
-        String mixinsInput = scanner.nextLine().toLowerCase();
-        List<String> mixins = Arrays.asList(mixinsInput.split(","));
-
-        // Calculate and display price
-        try {
-            double totalPrice = calculatePrice(dessertType, quantity, mixins);
-            System.out.printf("The total price for your order is: $%.2f\n", totalPrice);
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-        }
-
-        scanner.close();
-    }
+    return price;
 }
+
+function main() {
+    const readline = require('readline');
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    console.log("Welcome to the Dessert Pricing Calculator!");
+
+    rl.question("Enter the type of dessert (cookies, cupcakes, lunchbox_cake): ", (dessertType) => {
+        rl.question("Enter the quantity: ", (quantityInput) => {
+            const quantity = parseInt(quantityInput, 10);
+
+            console.log("Available mix-ins for cookies: chocolate_chunks, toffee_bits, m&ms, chopped_pecans, macadamia_nuts, white_chocolate_chips, matcha");
+            console.log("Available add-ons for cupcakes: ganache, salted_caramel, fruit_preserves, pastry_cream");
+
+            rl.question("Enter mix-ins separated by commas (e.g., chocolate_chunks,toffee_bits): ", (mixinsInput) => {
+                const mixins = mixinsInput.toLowerCase().split(",");
+
+                try {
+                    const totalPrice = calculatePrice(dessertType.toLowerCase(), quantity, mixins);
+                    console.log(`The total price for your order is: $${totalPrice.toFixed(2)}`);
+                } catch (error) {
+                    console.log(error.message);
+                }
+
+                rl.close();
+            });
+        });
+    });
+}
+
+main();
