@@ -1,80 +1,92 @@
-# Dessert Pricing Calculator
+import java.util.*;
 
-def calculate_price(dessert_type, quantity, mixins):
-    # Base prices
-    base_prices = {
-        "cookies": 12,  # per dozen
-        "cupcakes": 15,  # per dozen
-        "lunchbox_cake": 15  # per cake
+public class DessertPricingCalculator {
+
+    public static double calculatePrice(String dessertType, int quantity, List<String> mixins) {
+        // Base prices
+        Map<String, Double> basePrices = new HashMap<>();
+        basePrices.put("cookies", 12.0);  // per dozen
+        basePrices.put("cupcakes", 15.0); // per dozen
+        basePrices.put("lunchbox_cake", 15.0); // per cake
+
+        // Price per unit for less than a dozen
+        Map<String, Double> perUnitPrices = new HashMap<>();
+        perUnitPrices.put("cookies", 1.0); // per cookie
+        perUnitPrices.put("cupcakes", 1.25); // per cupcake
+
+        // Mix-in/add-on prices
+        Map<String, Double> mixinPrices = new HashMap<>();
+        mixinPrices.put("chocolate_chunks", 2.0);
+        mixinPrices.put("toffee_bits", 2.0);
+        mixinPrices.put("m&ms", 2.0);
+        mixinPrices.put("chopped_pecans", 3.0);
+        mixinPrices.put("macadamia_nuts", 3.0);
+        mixinPrices.put("white_chocolate_chips", 2.0);
+        mixinPrices.put("matcha", 3.0);
+        mixinPrices.put("ganache", 2.0);
+        mixinPrices.put("salted_caramel", 2.0);
+        mixinPrices.put("fruit_preserves", 2.0);
+        mixinPrices.put("pastry_cream", 3.0);
+        mixinPrices.put("none", 0.0);
+
+        double price = 0.0;
+
+        // Calculate base price
+        if (dessertType.equals("cookies") || dessertType.equals("cupcakes")) {
+            int dozens = quantity / 12;
+            int remainder = quantity % 12;
+
+            price = dozens * basePrices.get(dessertType);
+            if (remainder > 0) {
+                price += remainder * perUnitPrices.get(dessertType);
+            }
+        } else if (dessertType.equals("lunchbox_cake")) {
+            price = quantity * basePrices.get(dessertType);
+        } else {
+            throw new IllegalArgumentException("Invalid dessert type");
+        }
+
+        // Add mix-in prices
+        for (String mixin : mixins) {
+            if (mixinPrices.containsKey(mixin)) {
+                price += mixinPrices.get(mixin) * quantity;
+            } else {
+                throw new IllegalArgumentException("Invalid mix-in: " + mixin);
+            }
+        }
+
+        return price;
     }
 
-    # ppu for less than a dozen
-    per_unit_prices = {
-        "cookies": 1,  # per cookie
-        "cupcakes": 1.25  # per cupcake 
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Welcome to the Dessert Pricing Calculator!");
+
+        // Get dessert type
+        System.out.print("Enter the type of dessert (cookies, cupcakes, lunchbox_cake): ");
+        String dessertType = scanner.nextLine().toLowerCase();
+
+        // Get quantity
+        System.out.print("Enter the quantity: ");
+        int quantity = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
+
+        // Get mix-ins
+        System.out.println("Available mix-ins for cookies: chocolate_chunks, toffee_bits, m&ms, chopped_pecans, macadamia_nuts, white_chocolate_chips, matcha");
+        System.out.println("Available add-ons for cupcakes: ganache, salted_caramel, fruit_preserves, pastry_cream");
+        System.out.print("Enter mix-ins separated by commas (e.g., chocolate_chunks,toffee_bits): ");
+        String mixinsInput = scanner.nextLine().toLowerCase();
+        List<String> mixins = Arrays.asList(mixinsInput.split(","));
+
+        // Calculate and display price
+        try {
+            double totalPrice = calculatePrice(dessertType, quantity, mixins);
+            System.out.printf("The total price for your order is: $%.2f\n", totalPrice);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+
+        scanner.close();
     }
-
-    # Mix-in/add-on prices
-    mixin_prices = {
-        # Cookie mix-ins
-        "chocolate_chunks": 2,
-        "toffee_bits": 2,
-        "m&ms": 2,
-        "chopped_pecans": 3,
-        "macadamia_nuts": 3,
-        "white_chocolate_chips": 2,
-        "matcha": 3,
-        
-        # Cupcake add-ons
-        "ganache": 2,
-        "salted_caramel": 2,
-        "fruit_preserves": 2,
-        "pastry_cream": 3,
-
-        "none": 0
-    }
-
-    # Calculate base price
-    if dessert_type in ["cookies", "cupcakes"]:
-        dozens = quantity // 12
-        remainder = quantity % 12
-
-        # Base price for dozens and remainder
-        price = dozens * base_prices[dessert_type]
-        if remainder > 0:
-            price += remainder * per_unit_prices[dessert_type]
-    elif dessert_type == "lunchbox_cake":
-        price = quantity * base_prices[dessert_type]
-    else:
-        return "Invalid dessert type"
-
-    # Add mix-in prices
-    for mixin in mixins:
-        if mixin in mixin_prices:
-            price += mixin_prices[mixin] * quantity
-        else:
-            return f"Invalid mix-in: {mixin}"
-
-    return price
-
-# User Input
-def main():
-    print("Welcome to the Dessert Pricing Calculator!")
-
-    # Get dessert type
-    dessert_type = input("Enter the type of dessert (cookies, cupcakes, lunchbox_cake): ").lower()
-
-    # Get quantity
-    quantity = int(input("Enter the quantity: "))
-
-    # Get mix-ins
-    print("Available mix-ins for cookies: chocolate_chunks, toffee_bits, m&ms, chopped_pecans, macadamia_nuts, white_chocolate_chips, matcha")
-    print("Available add-ons for cupcakes: ganache, salted_caramel, fruit_preserves, pastry_cream")
-    mixins = input("Enter mix-ins separated by commas (e.g., chocolate_chunks,toffee_bits): ").lower().split(',')
-
-    # Calculate and display price
-    total_price = calculate_price(dessert_type, quantity, mixins)
-    print(f"The total price for your order is: ${total_price:.2f}")
-
-if __name__ == "__main__":
-    main()
+}
