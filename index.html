@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dessert Pricing Calculator</title>
+    <title>order form for gaargi's bakes</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: "Times New Roman", serif;
             margin: 20px;
             padding: 20px;
-            background-color: #f9f9f9;
+            background-color: #fffcf9;
+            font-color: #46536B;
         }
         label {
             display: block;
@@ -27,7 +28,7 @@
     </style>
 </head>
 <body>
-    <h1>Dessert Pricing Calculator</h1>
+    <h1>order form for gaargi's bakes</h1>
     <form id="orderForm">
         <label for="name">Name:</label>
         <input type="text" id="name" required>
@@ -46,16 +47,29 @@
 
         <label for="dessertType">Dessert Type:</label>
         <select id="dessertType">
-            <option value="cookies">Cookies</option>
-            <option value="cupcakes">Cupcakes</option>
-            <option value="lunchbox_cake">Lunchbox Cake</option>
+            <option value="cookies">cookies</option>
+            <option value="cupcakes">cupcakes</option>
+            <option value="lunchbox_cake">lunchbox cake</option>
         </select>
 
         <label for="quantity">Quantity:</label>
         <input type="number" id="quantity" min="1" required>
 
-        <label for="mixins">Mix-ins (comma-separated):</label>
-        <input type="text" id="mixins" placeholder="e.g., chocolate_chunks,toffee_bits">
+        <label for="mixins">Mix-ins:</label>
+        <select id="mixins" multiple>
+            <option value="chocolate_chunks">chocolate chunks</option>
+            <option value="toffee_bits">toffee bits</option>
+            <option value="m&ms">m&ms</option>
+            <option value="chopped_pecans">chopped pecans</option>
+            <option value="macadamia_nuts">macadamia nuts</option>
+            <option value="white_chocolate_chips">white chocolate chips</option>
+            <option value="matcha">matcha</option>
+            <option value="ganache">ganache</option>
+            <option value="salted_caramel">salted caramel</option>
+            <option value="fruit_preserves">fruit preserve</option>
+            <option value="pastry_cream">pastry cream</option>
+            <option value="none">None</option>
+        </select>
 
         <button type="button" onclick="handleOrder()">Calculate Price</button>
     </form>
@@ -72,7 +86,10 @@
             const allergies = document.getElementById('allergies').value;
             const dessertType = document.getElementById('dessertType').value;
             const quantity = parseInt(document.getElementById('quantity').value, 10);
-            const mixins = document.getElementById('mixins').value.split(',');
+
+            // Get selected mix-ins
+            const mixinsSelect = document.getElementById('mixins');
+            const mixins = Array.from(mixinsSelect.selectedOptions).map(option => option.value);
 
             try {
                 const price = calculatePrice(dessertType, quantity, mixins);
@@ -85,7 +102,7 @@
                     <p>Allergies: ${allergies}</p>
                     <p>Dessert: ${dessertType}</p>
                     <p>Quantity: ${quantity}</p>
-                    <p>Mix-ins: ${mixins.join(', ')}</p>
+                    <p>Mix-ins: ${mixins.map(mixin => mixin.replace('_', ' ')).join(', ')}</p>
                     <p>Total Price: $${price.toFixed(2)}</p>
                 `;
             } catch (error) {
